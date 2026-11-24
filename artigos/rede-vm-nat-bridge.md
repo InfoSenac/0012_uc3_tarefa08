@@ -18,3 +18,4 @@ Utilize este procedimento quando uma máquina virtual (VM) Windows ou Linux, exe
 6. Teste de Validação: Verifique o endereço IP, o gateway e a conectividade externa:
     * Teste: ``bash`` ``ping 8.8.8.8`` ``ping google.com``
 Se o primeiro teste funcionar e o segundo falhar, investigue a configuração DNS. Se ambos funcionarem, o acesso à internet foi restabelecido.
+!!!
