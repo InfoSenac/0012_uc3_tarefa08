@@ -1,30 +1,24 @@
-# Resolvendo inacessibilidade de Pastas Compartilhadas entre máquinas virtuais da VMWare e hipervisores no Windows 11 
-## 1. Quando aplicar
-- As soluções propostas são para usuários não conseguem acessar as pastas compartilhadas entre VM's do VMWare e a máquina hispervisora do Windows 11
-## 2. Possíveis causas 
-1. **As configurações de rede que permitem compartilhamento avançado pelo Windows não foram realizadas corretamente**
-1. **A opção "descoberta de rede privada" não está ligada no Windows**
-1. **A configuração do compartilhamento avançado não foi configurada corretamente na pasta a ser compartilhada**
-1. **A opção "Shared Folders" não está ligada na seção "Options" da máquina virtual**
-1. **A pasta a ser acessada não foi montada no S.O. do Linux** 
-## 3. Passo a Passo para cada causa
-### Primeiro caso e Segundo caso
-- Acesse configurações → rede e internet → configurações avanvaçadas de rede → configurações de compartilhamento avançadas 
-- Há três opções com configurações similares (Redes Privadas/Públicas/Domínio/Todas)
-- Habilite a configuração "Compartilhamento de arquivos e impressoras" **(para o primeiro caso)**
-- Habilite a configuração "Descoberta de Rede" **(para o segundo caso)**
->** Alerta de Segurança: Não ative a descoberta de rede de tipos de rede que você não vai utilizar**
-### Terceiro caso
-- Acesse as propriedades avançadas da pasta (alt+Enter) → Compartilhamento → Compartilhamento Avançado → Adicione a máquina virtual ao grupo de usuários com todas as permissões
->** Alerta de Segurança: Não coloque para que o usuário "Todos" tenham acesso completo à qualquer pasta enquanto estiver na rede pública**
-### Quarto caso
-- Acesse aba de edição de configurações da máquina desejada → "Options" → "Shared Folders" → Escolha entre a 2ª ou 3ª opção → clique em "Add" → escolha o caminho da pasta em "Browse" → Nomeie como quiser → Marque a opção "Enable this share" → "Finish"   
-### Quinto caso
-- Instale o VMWare Tools com: 
-```bash
-sudo apt update && sudo apt install open-vm-tools open-vm-tools-desktop
-```
-- Com o terminal Bash aberto digite:
-```bash
-vmhgfs-fuse .host:/ /mnt/hgfs -o allow-other 
-``` 
+# Configurar pasta compartilhada do Windows em uma VM Linux no VMware
+
+> **Alerta de Segurança:** Compartilhe apenas pastas necessárias e conceda acesso somente a usuários autorizados.
+
+## 1. Quando Aplicar (Sintoma)
+Aplique este procedimento quando o Linux da máquina virtual não conseguir acessar uma pasta do Windows configurada no VMware.
+Ele cobre a ativação do recurso, a instalação das ferramentas no Linux e a montagem da pasta.
+
+## 2. Ferramentas/Componentes Necessários
+* **Hardware / Físico:** Computador com Windows e máquina virtual Linux.
+* **Software:** VMware Workstation, VMware Tools ou `open-vm-tools`.
+
+## 3. Passo a Passo Rápido
+1. Desligue a VM. Em **VM Settings > Options > Shared Folders**, habilite o recurso, adicione a pasta do Windows e marque **Enable this share**.
+2. Inicie o Linux e instale as ferramentas, se ainda não estiverem instaladas:
+   ```bash
+   sudo apt update && sudo apt install open-vm-tools open-vm-tools-desktop
+   ```
+3. Crie o ponto de montagem e monte as pastas compartilhadas:
+   ```bash
+   sudo mkdir -p /mnt/hgfs
+   sudo vmhgfs-fuse .host:/ /mnt/hgfs
+   ```
+4. **Teste de Validação:** Execute `ls /mnt/hgfs` e confirme que o nome da pasta compartilhada aparece.
